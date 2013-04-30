@@ -7,8 +7,8 @@ PImage kuwahara;
 PImage gradient;
 
 void setup() {
-  String image_file = "brain_image_1.png";
-  String gradient_file = "brain_gradient_2.png";
+  String image_file = "Engine_2.png";
+  String gradient_file = "Engine_gradient.png";
   img = loadImage(image_file);  // Load the image into the program
   sobel = loadImage(image_file);
   kuwahara = loadImage(image_file);
@@ -144,7 +144,7 @@ void draw()
   }
  */
  
- 
+ /*
  // draw points as stippling
   for(int i=1; i<img.height/radius; i++)
   {
@@ -162,6 +162,7 @@ void draw()
       draw_points(x, y, radius, (255 - average) / 255 * 16 / radius);
     }
   }
+  */
   
   //noStroke();
   //fill(color(0, 0, 0));
@@ -179,7 +180,7 @@ void draw()
       if(r+g > 32)
       {
         float angle = arc_tangent(g, r);
-        float length = random((r+g)/255*8*radius);
+        float length = random((r+g)/255*2*radius);
         float xx = length * cos(angle);
         float yy = length * sin(angle);
         //ellipse(x, y, radius, radius);
