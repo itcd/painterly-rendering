@@ -2,6 +2,7 @@ PImage img_edge, img_yellow, img_magenta;
 PImage img_original;
 PImage intersection;
 PImage buffer;
+final int radius = 1;
 final int modulated_scale = 1; // both modulated_scale * size1 and modulated_scale * size2 should be in [0,255]
 ArrayList<PVector> centroid_list1 = new ArrayList<PVector>(); // store the centroid and pixel count of a shape
 ArrayList<PVector> centroid_list2 = new ArrayList<PVector>(); // store the centroid and pixel count of a shape
@@ -669,8 +670,6 @@ void draw() {
   //  background(img_original);
     draw_centroids();
     compute_and_draw_connection_lines();
-  
-    final int radius = 1;
     
     buffer.loadPixels();
     intersection.loadPixels();
