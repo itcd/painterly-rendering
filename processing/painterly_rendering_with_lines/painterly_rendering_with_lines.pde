@@ -121,7 +121,7 @@ void draw()
   sobel_filter(kuwahara, sobel);
 
   background(255);
-  background(img);
+//  background(img);
   
   int radius = 4;
   
@@ -240,5 +240,3 @@ void draw_points(int x, int y, float radius, float density)
     }
   }
 }
-
-
