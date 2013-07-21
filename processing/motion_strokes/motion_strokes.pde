@@ -1,8 +1,8 @@
-PImage img, img_yellow, img_magenta;
-PImage volume_image;
+PImage img_edge, img_yellow, img_magenta;
+PImage img_original;
 PImage intersection;
 PImage buffer;
-final int modulated_scale = 13; // both modulated_scale * size1 and modulated_scale * size2 should be in [0,255]
+final int modulated_scale = 1; // both modulated_scale * size1 and modulated_scale * size2 should be in [0,255]
 ArrayList<PVector> centroid_list1 = new ArrayList<PVector>(); // store the centroid and pixel count of a shape
 ArrayList<PVector> centroid_list2 = new ArrayList<PVector>(); // store the centroid and pixel count of a shape
 ArrayList<PVector> sample_list1 = new ArrayList<PVector>(); // store a sample point and intersection index of a shape
@@ -12,6 +12,19 @@ int size1 = 0;
 int size2 = 0;
 int size3 = 0;
 int channel = 0;
+
+void init()
+{
+  centroid_list1.clear();
+  centroid_list2.clear();
+  sample_list1.clear();
+  sample_list2.clear();
+  intersection_list.clear();
+  size1 = 0;
+  size2 = 0;
+  size3 = 0;
+  channel = 0;
+}
 
 boolean in_range(PVector pos, PImage map)
 {
@@ -243,40 +256,6 @@ void flood_fill_recursive_search(PImage map, PVector start_node, color target_co
   }
 }
 
-void setup() {
-  noLoop();
-  img = loadImage("frame00000.png");
-  size(img.width, img.height);
-  int n = width * height;
-  
-  img_yellow = loadImage("frame00000.png");
-  img_yellow.loadPixels();
-  for (int i = 0; i < n; i++)
-  {
-    float r = red(img_yellow.pixels[i]);
-    float g = green(img_yellow.pixels[i]);
-    float b = blue(img_yellow.pixels[i]);
-    img_yellow.pixels[i] = color(255, 255, b);
-  }
-  img_yellow.updatePixels();
-  
-  img_magenta = loadImage("frame00000.png");
-  img_magenta.loadPixels();
-  for (int i = 0; i < n; i++)
-  {
-    float r = red(img_magenta.pixels[i]);
-    float g = green(img_magenta.pixels[i]);
-    float b = blue(img_magenta.pixels[i]);
-    img_magenta.pixels[i] = color(255, g, 255);
-  }
-  img_magenta.updatePixels();
-  
-  buffer = createImage(img.width, img.height, RGB);
-  intersection = createImage(img.width, img.height, RGB);
-  
-  volume_image = loadImage("1/frame00000.png");
-}
-
 // draw centroids
 void draw_centroids()
 {
@@ -303,8 +282,26 @@ void draw_centroids()
   }
 }
 
+boolean is_intersected(float rate1, float rate2)
+{
+  if(rate1 > 0.5 && rate2 > 0.5)
+  {
+    if(rate1 * rate2 > 95.449974)
+    {
+      println("  rate1 * rate2 = " + rate1 * rate2 + " > 95.449974 shapes are too close so no connection line is drawn for the above intersection");
+      return false;
+    }else
+    {
+      return true;
+    }
+  }else
+ {
+   return false;
+ } 
+}
+
 // draw lines between centroids
-void draw_connection_lines()
+void compute_and_draw_connection_lines()
 {
   for(int i=0; i<size3; i++)
   {
@@ -318,12 +315,12 @@ void draw_connection_lines()
     PVector pp1 = sample_list1.get(index1);
     PVector pp2 = sample_list2.get(index2);
     
-    println("i=" + i + " index " + index1 + " " + index2 + " intersection count "+ p.z + " pixel count " + p1.z + " " + p2.z + " rate " + rate1 + " " + rate2);
+//    println("i=" + i + " index " + index1 + " " + index2 + " intersection count "+ p.z + " pixel count " + p1.z + " " + p2.z + " rate " + rate1 + " " + rate2);
     
     if(pp1.z == -1)
     {
       pp1.z = i;
-      println("  pp1.z==-1");
+//      println("  pp1.z==-1");
     }else
     {
       int pre_index = (int)pp1.z;
@@ -334,17 +331,17 @@ void draw_connection_lines()
       PVector pre_centroid2 = centroid_list2.get(pre_index2);
       float pre_rate1 = pre_p.z / pre_centroid1.z;
       float pre_rate2 = pre_p.z / pre_centroid2.z;
-      println("  previous i=" + pp1.z + " index " + pre_index1 + " " + pre_index2 + " rate " + pre_rate1 + " " + pre_rate2);
+//      println("  previous i=" + pp1.z + " index " + pre_index1 + " " + pre_index2 + " rate " + pre_rate1 + " " + pre_rate2);
       if(rate1 * rate2 > pre_rate1 * pre_rate2)
       {
         pp1.z = i;
-        println("  rate1 * rate2 > pre_rate1 * pre_rate2");
+//        println("  rate1 * rate2 > pre_rate1 * pre_rate2");
       }
     }
     if(pp2.z == -1)
     {
       pp2.z = i; 
-      println("  pp2.z==-1");
+//      println("  pp2.z==-1");
     }else
     {
       int pre_index = (int)pp2.z;
@@ -355,28 +352,22 @@ void draw_connection_lines()
       PVector pre_centroid2 = centroid_list2.get(pre_index2);
       float pre_rate1 = pre_p.z / pre_centroid1.z;
       float pre_rate2 = pre_p.z / pre_centroid2.z;
-      println("  previous i=" + pp2.z  + " index " + pre_index1 + " " + pre_index2 + " rate " + pre_rate1 + " " + pre_rate2);
+//      println("  previous i=" + pp2.z  + " index " + pre_index1 + " " + pre_index2 + " rate " + pre_rate1 + " " + pre_rate2);
       if(rate1 * rate2 > pre_rate1 * pre_rate2)
       {
         pp1.z = i;
-        println("  rate1 * rate2 > pre_rate1 * pre_rate2");
+//        println("  rate1 * rate2 > pre_rate1 * pre_rate2");
       }
     }
     
-    if(rate1 > 0.5 && rate2 > 0.5)
+    if(is_intersected(rate1, rate2))
     {
-      if(rate1 * rate2 > 95.449974)
-      {
-        println("  rate1 * rate2 = " + rate1 * rate2 + " > 95.449974 shapes are too close so no connection line is drawn for the above intersection");
-      }else
-      {
-        strokeWeight(3);  // Thicker
-        stroke(255, 0, 0);
-        line(p1.x, p1.y, p2.x, p2.y);
-        strokeWeight(1);  // Thicker
-        stroke(255);
-        line(p1.x, p1.y, p2.x, p2.y);
-      }
+      strokeWeight(3);  // Thicker
+      stroke(255, 0, 0);
+      line(p1.x, p1.y, p2.x, p2.y);
+      strokeWeight(1);  // Thicker
+      stroke(255);
+      line(p1.x, p1.y, p2.x, p2.y);
     }
   }  
 }
@@ -469,11 +460,301 @@ void search_for_intersection()
   intersection.updatePixels();
 }
 
+float offset(float radius)
+{
+  return random(radius * 2) - radius;
+}
+
+float arc_tangent(float y, float x)
+{
+  float angle;
+  if(abs(x)<1e-6)
+    angle = HALF_PI;
+  else
+    angle = atan(y/x);
+  return angle + HALF_PI;
+}
+
+// draw motion strokes on intersected shapes
+void draw_motion_lines(int x, int y, float radius, float density, PVector pos1, PVector pos2)
+{
+  // calculate how many points to draw
+  float radius_square = radius * radius;
+  float amount = radius_square * density;
+  
+  for(int i=0; i<amount; i++)
+  {
+    // get a point within the circle with the radius
+    float dx, dy;
+    do
+    {
+      dx = offset(radius);
+      dy = offset(radius);
+    }while(dx * dx + dy * dy > radius_square);
+    
+    // draw the new point
+    int x2 = x + (int)(dx);
+    int y2 = y + (int)(dy);
+    if(x2 >= 0  && x2 < img_original.width && y2 >= 0  && y2 < img_original.height)
+    {
+      //ellipse (x2, y2, random(radius)+1, random(radius)+1);
+//      int loc = x + y * img_original.width;
+      PVector dir = PVector.sub(pos1, pos2);
+//      color c = sobel.pixels[loc];
+//      float r = red(c); // gx
+//      float g = green(c); // gy
+//      if(r+g > 32)
+      { //<>//
+//        float angle = arc_tangent(dir.y, dir.x);
+        float angle = atan2(dir.y, dir.x);
+        //ellipse (x2, y2, r/255*radius, g/255*radius);
+        float length = random((dir.x+dir.y)/255*8*radius);
+        float xx = length * cos(angle);
+        float yy = length * sin(angle);
+        //pushMatrix();
+        float weight = 3;
+        strokeWeight(weight);
+        line(x2-xx, y2-yy, x2+xx, y2+yy);
+        //rotate(angle+HALF_PI);
+        //line(x2, y2, x2, y2+length);
+        //popMatrix();
+      }
+    }
+  }
+}
+
+//// draw motion strokes on intersected shapes
+//void draw_motion_strokes(int x, int y, float radius, float density, PVector pos1, PVector pos2)
+//{
+//  PVector dir = PVector.sub(pos1, pos2);
+//  float angle = atan2(dir.y, dir.x);
+//  pushMatrix();
+//  rotate(angle);
+//  line(x - radius, y - radius, x + radius, y + radius);
+//  popMatrix();
+//  
+////  // calculate how many points to draw
+////  float radius_square = radius * radius;
+////  float amount = radius_square * density;
+////  
+////  for(int i=0; i<amount; i++)
+////  {
+////    // get a point within the circle with the radius
+////    float dx, dy;
+////    do
+////    {
+////      dx = offset(radius);
+////      dy = offset(radius);
+////    }while(dx * dx + dy * dy > radius_square);
+////    
+////    // draw the new point
+////    int x2 = x + (int)(dx);
+////    int y2 = y + (int)(dy);
+////    if(x2 >= 0  && x2 < img_original.width && y2 >= 0  && y2 < img_original.height)
+////    {
+////      //ellipse (x2, y2, random(radius)+1, random(radius)+1);
+////      int loc = x + y * img_original.width;
+////      PVector dir = PVector.sub(pos1, pos2);
+//////      color c = sobel.pixels[loc];
+//////      float r = red(c); // gx
+//////      float g = green(c); // gy
+//////      if(r+g > 32)
+////      {
+////        float angle = arc_tangent(dir.y, dir.x);
+////        //ellipse (x2, y2, r/255*radius, g/255*radius);
+////        float length = random((dir.x+dir.y)/255*8*radius);
+////        float xx = length * cos(angle);
+////        float yy = length * sin(angle);
+////        //pushMatrix();
+////        float weight = 3;
+////        strokeWeight(weight);
+////        line(x2-xx, y2-yy, x2+xx, y2+yy);
+////        //rotate(angle+HALF_PI);
+////        //line(x2, y2, x2, y2+length);
+////        //popMatrix();
+////      }
+////    }
+////  }
+//}
+
+String get_edge_filename(int n)
+{
+  if(n < 10)
+    return "6/frame0000" + n + ".png";
+  if(n >= 10 && n < 100)
+    return "6/frame000" + n + ".png";
+  if(n >= 100 && n < 1000)
+    return "6/frame00" + n + ".png";
+  if(n >= 1000 && n < 10000)
+    return "6/frame0" + n + ".png";
+  return "6/frame" + n + ".png";
+}
+
+String get_original_filename(int n)
+{
+  if(n < 10)
+    return "1/frame0000" + n + ".png";
+  if(n >= 10 && n < 100)
+    return "1/frame000" + n + ".png";
+  if(n >= 100 && n < 1000)
+    return "1/frame00" + n + ".png";
+  if(n >= 1000 && n < 10000)
+    return "1/frame0" + n + ".png";
+  return "1/frame" + n + ".png";
+}
+
+String get_target_filename(int n)
+{
+  if(n < 10)
+    return "output/frame0000" + n + ".png";
+  if(n >= 10 && n < 100)
+    return "output/frame000" + n + ".png";
+  if(n >= 100 && n < 1000)
+    return "output/frame00" + n + ".png";
+  if(n >= 1000 && n < 10000)
+    return "output/frame0" + n + ".png";
+  return "output/frame" + n + ".png";
+}
+
+void setup() {
+  noLoop();
+
+  String edge_image_str = get_edge_filename(0);
+  img_edge = loadImage(edge_image_str);
+  size(img_edge.width, img_edge.height);
+}
+
 void draw() {
-  search_for_intersection();
-//  intersection.copy(buffer, 0, 0, buffer.width, buffer.height, 0, 0, intersection.width, intersection.height);
-  background(intersection);
-  draw_centroids();
-  draw_connection_lines();
-//  background(volume_image);
+////////////////////////////////////////////////////////////////
+/// initialize
+  for(int file_index=0; file_index<=99; file_index++)
+  {
+    init();
+    String edge_image_str = get_edge_filename(file_index);
+    String original_image_str = get_original_filename(file_index);
+    println(original_image_str);
+    img_edge = loadImage(edge_image_str);
+    img_original = loadImage(original_image_str);
+  
+    final int n = width * height;
+    
+    img_yellow = loadImage(edge_image_str);
+    img_yellow.loadPixels();
+    for (int i = 0; i < n; i++)
+    {
+      float r = red(img_yellow.pixels[i]);
+      float g = green(img_yellow.pixels[i]);
+      float b = blue(img_yellow.pixels[i]);
+      img_yellow.pixels[i] = color(255, 255, b);
+    }
+    img_yellow.updatePixels();
+    
+    img_magenta = loadImage(edge_image_str);
+    img_magenta.loadPixels();
+    for (int i = 0; i < n; i++)
+    {
+      float r = red(img_magenta.pixels[i]);
+      float g = green(img_magenta.pixels[i]);
+      float b = blue(img_magenta.pixels[i]);
+      img_magenta.pixels[i] = color(255, g, 255);
+    }
+    img_magenta.updatePixels();
+    
+    buffer = createImage(img_edge.width, img_edge.height, RGB);
+    intersection = createImage(img_edge.width, img_edge.height, RGB);
+  ////////////////////////////////////////////////////////////////
+    
+    search_for_intersection();
+  //  intersection.copy(buffer, 0, 0, buffer.width, buffer.height, 0, 0, intersection.width, intersection.height);
+  //  background(img_original);
+    draw_centroids();
+    compute_and_draw_connection_lines();
+  
+    final int radius = 1;
+    
+    buffer.loadPixels();
+    intersection.loadPixels();
+    img_original.loadPixels();
+   
+    // fill background
+    noStroke();
+    for(int i=0; i<img_original.height/radius; i++)
+    {
+      for(int j=0; j<img_original.width/radius; j++)
+      {
+        int x = j * radius;
+        int y = i * radius;
+        int loc = x + y * img_original.width;
+        fill(img_original.pixels[loc]);
+        rect(x, y, radius, radius);
+      }
+    }
+    
+   // draw motion strokes on intersected shapes
+    for(int i=1; i<img_original.height/radius; i++)
+    {
+      for(int j=1; j<img_original.width/radius; j++)
+      {
+        int x = j * radius;
+        int y = i * radius;
+        int loc = x + y * img_original.width;
+        
+        PVector pos = new PVector(x, y);
+  
+        int i1 = decode_index_from_pixel(pos, buffer, 1);
+        int i2 = decode_index_from_pixel(pos, buffer, 2);
+        int index1 = -1;
+        int index2 = -1;
+        int index3 = -1;
+        
+        if(i1 != -1)
+        {
+          PVector sp1 = sample_list1.get(i1);
+          if(sp1.z != -1)
+          {
+            index1 = i1;
+            index3 = (int)sp1.z;
+            PVector p3 = intersection_list.get(index3);
+            index2 = (int)p3.y;
+          }
+        }else
+        {
+          if(i2 != -1)
+          {
+            PVector sp2 = sample_list2.get(i2);
+            if(sp2.z != -1)
+            {
+              index2 = i2;
+              index3 = (int)sp2.z;
+              PVector p3 = intersection_list.get(index3);
+              index1 = (int)p3.x;
+            }
+          }
+        }
+         
+        if(index1 != -1 && index2 != -1 && index3 != -1)
+        {
+//          println("x=" + x + " y=" + y + "i1=" + i1 + " i2=" + i2 + " indexes " + index1 + " " + index2 + " " + index3);
+          PVector centroid1 = centroid_list1.get(index1);
+          PVector centroid2 = centroid_list2.get(index2);
+          PVector p3 = intersection_list.get(index3);
+          float rate1 = p3.z / centroid1.z;
+          float rate2 = p3.z / centroid2.z;
+          
+          if(is_intersected(rate1, rate2))
+          {
+            float r = red(img_original.pixels[loc]);
+            float g = green(img_original.pixels[loc]);
+            float b = blue(img_original.pixels[loc]);
+            float average = (r + g + b) / 3;
+            fill(color(r, g, b));
+            stroke(color(r, g, b));
+            draw_motion_lines(x, y, radius, (255 - average) / 255 * 16 / radius, centroid1, centroid2);          
+          }
+        }
+      }
+    }
+    
+    save(get_target_filename(file_index));    
+  }
 }

@@ -6,7 +6,7 @@ PImage sobel;
 PImage kuwahara;
 
 void setup() {
-  String image_file = "lotus.jpg";
+  String image_file = "frame00000.png";
   img = loadImage(image_file);  // Load the image into the program
   sobel = loadImage(image_file);
   kuwahara = loadImage(image_file);
@@ -224,7 +224,8 @@ void draw_points(int x, int y, float radius, float density)
       float g = green(c);
       if(r+g > 32)
       {
-        float angle = arc_tangent(g, r);
+//        float angle = arc_tangent(g, r);
+        float angle = atan2(g, r);
         //ellipse (x2, y2, r/255*radius, g/255*radius);
         float length = random((r+g)/255*8*radius);
         float xx = length * cos(angle);
