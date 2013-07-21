@@ -13,7 +13,7 @@ int size2 = 0;
 int size3 = 0;
 int channel = 0;
 
-void init()
+void reinitialise()
 {
   centroid_list1.clear();
   centroid_list2.clear();
@@ -629,7 +629,7 @@ void draw() {
 /// initialize
   for(int file_index=0; file_index<=99; file_index++)
   {
-    init();
+    reinitialise();
     String edge_image_str = get_edge_filename(file_index);
     String original_image_str = get_original_filename(file_index);
     println(original_image_str);
