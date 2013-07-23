@@ -4,7 +4,7 @@
 PImage img;
 
 void setup() {
-  img = loadImage("penguin.jpg");  // Load the image into the program
+  img = loadImage("lotus.jpg");  // Load the image into the program
   size(img.width, img.height);
 }
 
@@ -26,7 +26,7 @@ void draw()
       float g = green(img.pixels[loc]);
       float b = blue(img.pixels[loc]);
       float average = (r + g + b) / 3;
-      fill(color(r, g, b));
+      fill(color(r, g, b)); //<>//
       draw_points(x, y, radius, (255 - average) / 255 * 8 / radius);
     }
   }
@@ -63,4 +63,3 @@ void draw_points(int x, int y, float radius, float density)
     }
   }
 }
-
