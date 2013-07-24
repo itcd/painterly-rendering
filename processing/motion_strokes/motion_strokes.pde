@@ -628,7 +628,7 @@ void draw() {
 ////////////////////////////////////////////////////////////////
 /// initialize
   final int radius = 2;
-  for(int file_index=0; file_index<100; file_index++)
+  for(int file_index=0; file_index<1; file_index++)
   {
     reinitialise();
     String edge_image_str = get_edge_filename(file_index);
