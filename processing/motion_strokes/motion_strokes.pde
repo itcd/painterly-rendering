@@ -2,7 +2,6 @@ PImage img_edge, img_yellow, img_magenta;
 PImage img_original;
 PImage intersection;
 PImage buffer;
-final int radius = 1;
 final int modulated_scale = 1; // both modulated_scale * size1 and modulated_scale * size2 should be in [0,255]
 ArrayList<PVector> centroid_list1 = new ArrayList<PVector>(); // store the centroid and pixel count of a shape
 ArrayList<PVector> centroid_list2 = new ArrayList<PVector>(); // store the centroid and pixel count of a shape
@@ -628,7 +627,8 @@ void setup() {
 void draw() {
 ////////////////////////////////////////////////////////////////
 /// initialize
-  for(int file_index=0; file_index<=99; file_index++)
+  final int radius = 2;
+  for(int file_index=0; file_index<100; file_index++)
   {
     reinitialise();
     String edge_image_str = get_edge_filename(file_index);
@@ -674,6 +674,8 @@ void draw() {
     buffer.loadPixels();
     intersection.loadPixels();
     img_original.loadPixels();
+    
+    background(255);
    
     // fill background
     noStroke();
@@ -688,6 +690,8 @@ void draw() {
         rect(x, y, radius, radius);
       }
     }
+    
+    filter(BLUR);
     
    // draw motion strokes on intersected shapes
     for(int i=1; i<img_original.height/radius; i++)
@@ -751,6 +755,21 @@ void draw() {
             draw_motion_lines(x, y, radius, (255 - average) / 255 * 16 / radius, centroid1, centroid2);          
           }
         }
+//        else
+//        {
+//          noStroke();
+//          for(int ii=0; ii<radius; ii++)
+//          {
+//            for(int jj=0; jj<radius; jj++)
+//            {
+//              int xx = x + ii;
+//              int yy = y + jj;
+//              int loc2 = xx + yy * img_original.width;
+//              fill(img_original.pixels[loc2]);
+//              rect(xx, yy, 1, 1);
+//            }
+//          } 
+//        }
       }
     }
     
