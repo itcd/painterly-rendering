@@ -6,7 +6,7 @@ PImage sobel;
 PImage kuwahara;
 
 void setup() {
-  String image_file = "frame00000.png";
+  String image_file = "cute_white_kitten.jpg";
   img = loadImage(image_file);  // Load the image into the program
   sobel = loadImage(image_file);
   kuwahara = loadImage(image_file);
@@ -121,7 +121,8 @@ void draw()
   sobel_filter(kuwahara, sobel);
 
   background(255);
-//  background(img);
+  background(img);
+  filter(BLUR, 6);
   
   int radius = 4;
   
