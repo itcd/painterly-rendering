@@ -286,9 +286,10 @@ boolean is_intersected(float rate1, float rate2)
 {
   if(rate1 > 0.5 && rate2 > 0.5)
   {
-    if(rate1 * rate2 > 95.449974)
+//    if(rate1 * rate2 > 95.449974)
+    if(rate1 * rate2 > 0.95)
     {
-      println("  rate1 * rate2 = " + rate1 * rate2 + " > 95.449974 shapes are too close so no connection line is drawn for the above intersection");
+      println("  rate1 * rate2 = " + rate1 * rate2 + " > 0.95. shapes are too close so no connection line is drawn for the above intersection");
       return false;
     }else
     {
@@ -627,8 +628,8 @@ void setup() {
 void draw() {
 ////////////////////////////////////////////////////////////////
 /// initialize
-  final int radius = 2;
-  for(int file_index=0; file_index<1; file_index++)
+  final int radius = 1;
+  for(int file_index=0; file_index<20; file_index++)
   {
     reinitialise();
     String edge_image_str = get_edge_filename(file_index);
@@ -773,6 +774,7 @@ void draw() {
       }
     }
     
-    save(get_target_filename(file_index));    
+    save(get_target_filename(file_index));
+    //background(img_yellow);
   }
 }
