@@ -20,13 +20,15 @@
 
 \.aux$
 \.log$
-\.gz$
+\.synctex.gz$
 \.dvi$
 \.bbl$
 \.blg$
 \.ps$
 \.brf$
 \.lbl$
+\.out$
+\.toc$
 
 ^build/
 /build/
@@ -42,3 +44,6 @@
 
 ^sync.ffs_db$
 \sync.ffs_db$
+
+^.DS_Store$
+\.DS_Store$
